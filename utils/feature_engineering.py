@@ -1,7 +1,8 @@
 import pandas as pd
 
 def feature_engineering (df):
-
+    #Droping forward seing features
+    df.drop(columns = ["Close", "Up", "Down", "PLOT1", "PLOT2"], inplace = True)
     #Compute rolling windows
     df["rolling_1Y"] =df["Open"].rolling(365*24).mean()
     df["rolling_90d"] =df["Open"].rolling(90*24).mean()
@@ -15,10 +16,15 @@ def feature_engineering (df):
     #Compute Low_high_delta (volatilité) 
     
     df["vol"] = df["High"].shift(1) - df["Low"].shift(1)
-    df["vol_last_day"] = df["High"].rolling(24).max() - df["Low"].rolling(24).min()
+    df["vol_rolling"] = df["vol"].rolling(24).mean()
+    df["vol_last_day"] = df["High"].rolling(24).max().shift(1) - df["Low"].rolling(24).min().shift(1)
 
-    #Compute returns
 
+   
+    #Droping forward seing features
+    df.drop(columns = ["High", "Low"], inplace = True)
+
+     #Compute returns
     df["return_1h"] = df["Open"].pct_change(1)
     df["return_24h"] = df["Open"].pct_change(24) 
 
